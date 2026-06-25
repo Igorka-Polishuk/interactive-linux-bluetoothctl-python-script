@@ -58,6 +58,7 @@ def start_connection():
     choice = questionary.select("What's device connect?", choices=device_names).ask()
 
     mac_address = list(devices_info.keys())[list(device_names).index(choice)]
+    device_name = devices_info[mac_address]
 
     if connect_device(mac_address, choice):
         print(f"✅ Connected to {device_name}")
