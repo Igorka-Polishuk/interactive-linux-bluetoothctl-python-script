@@ -73,3 +73,29 @@ def connect_device(device_mac_address: str, device_name: str) -> bool:
         time.sleep(2)
 
     return False
+
+
+def get_connect_device_info():
+    interactiveSession = InteractiveSession()
+    info_result = interactiveSession.run("info")
+
+    device_name = re.search(r"^\s*Name:\s*(.+)$", info_result, re.MULTILINE).group(1)
+    mac_address = re.search(r"^Device\s+([0-9A-F:]{17})", info_result, re.MULTILINE).group(1)
+
+    return {
+        "device_name": device_name,
+        "device_mac_address": mac_address
+    }
+
+
+def disconnect_device(device_mac_address: str) -> bool:
+    interactiveSession = InteractiveSession()
+
+    disconnect_result = interactiveSession.run(f"disconnect {device_mac_address}")
+    remove_result = interactiveSession.run(f"remove {device_mac_address}")
+
+    if re.search(r"\bSuccessful disconnected\b", disconnect_result) and re.search(r"\bDevice has been removed\b", remove_result):
+        return True
+    
+    return False
+
