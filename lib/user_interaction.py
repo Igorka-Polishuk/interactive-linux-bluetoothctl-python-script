@@ -15,7 +15,7 @@ from lib.sys_interaction import (
     start_bluetoothctl_service,
     connect_device,
 )
-from lib.interactive_session import InteractiveSession
+from lib.interactive_session import run
 
 
 def start_connection():
@@ -28,15 +28,14 @@ def start_connection():
 
     print("✅ Bluetooth enabled")
 
-    interactive_session = InteractiveSession()
     # ! Use { run } instead of { run_interactive }
-    interactive_session.run("--timeout 5 scan on")
+    run("--timeout 5 scan on")
 
     result = ""
     while True:
-        result = interactive_session.run("devices")
+        result = run("devices")
         if not result:
-            interactive_session.run("--timeout 10 scan on")
+            run("--timeout 10 scan on")
         else:
             break
 

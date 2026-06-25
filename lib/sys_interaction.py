@@ -5,7 +5,7 @@ import re
 import time
 
 from lib.check_state import is_connected
-from lib.interactive_session import InteractiveSession
+from lib.interactive_session import run, run_interactive
 from lib.constants import CONNECT_TIMEOUT
 
 
@@ -49,23 +49,22 @@ def get_names_and_mac_addresses_of_devices(input_str: str):
 
 def power_on():
     print("Enabling Bluetooth...")
-    InteractiveSession().run("power on")
+    run("power on")
     time.sleep(1)
 
 
 def connect_device(device_mac_address: str, device_name: str) -> bool:
     # * ------------------------------Pair and trust------------------------------
     print(f"‼️ Pairing to {device_name}")
-    interactive_session = InteractiveSession()
-    interactive_session.run_interactive(f"pair {device_mac_address}", wait=5)
-    interactive_session.run_interactive(f"trust {device_mac_address}")
+    run_interactive(f"pair {device_mac_address}", wait=5)
+    run_interactive(f"trust {device_mac_address}")
     print(f"✅ Paired")
     # * ------------------------------Pair and trust------------------------------
 
     print(f"‼️ Connecting to {device_mac_address}")
     deadline = time.time() + CONNECT_TIMEOUT
     while deadline > time.time():
-        output = interactive_session.run(f"connect {device_mac_address}")
+        output = run(f"connect {device_mac_address}")
         if "Connection successful" in output or is_connected():
             return True
 
@@ -76,8 +75,7 @@ def connect_device(device_mac_address: str, device_name: str) -> bool:
 
 
 def get_connect_device_info():
-    interactiveSession = InteractiveSession()
-    info_result = interactiveSession.run("info")
+    info_result = run("info")
 
     device_name = re.search(r"^\s*Name:\s*(.+)$", info_result, re.MULTILINE).group(1)
     mac_address = re.search(r"^Device\s+([0-9A-F:]{17})", info_result, re.MULTILINE).group(1)
@@ -89,10 +87,8 @@ def get_connect_device_info():
 
 
 def disconnect_device(device_mac_address: str) -> bool:
-    interactiveSession = InteractiveSession()
-
-    disconnect_result = interactiveSession.run(f"disconnect {device_mac_address}")
-    remove_result = interactiveSession.run(f"remove {device_mac_address}")
+    disconnect_result = run(f"disconnect {device_mac_address}")
+    remove_result = run(f"remove {device_mac_address}")
 
     if re.search(r"\bSuccessful disconnected\b", disconnect_result) and re.search(r"\bDevice has been removed\b", remove_result):
         return True
