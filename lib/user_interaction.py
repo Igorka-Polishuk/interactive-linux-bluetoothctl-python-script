@@ -4,7 +4,6 @@ import questionary
 from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
-from rich import print as rich_print
 
 from lib.check_state import is_powered
 from lib.sys_interaction import (
@@ -16,6 +15,7 @@ from lib.sys_interaction import (
     connect_device,
 )
 from lib.interactive_session import run
+from lib.utils import print_failed_msg, print_successful_msg
 
 
 def start_connection():
@@ -23,10 +23,10 @@ def start_connection():
     if not is_powered():
         is_started = start_bluetoothctl_service()
         if not is_started:
-            rich_print("[bold red]Failed to enable Bluetooth[/bold red]")
+            print_failed_msg("Failed to enable Bluetooth")
             sys.exit(1)
 
-    rich_print("[bold green]Bluetooth enabled[/bold green]")
+    print_successful_msg("Bluetooth enabled")
 
     # ! Use { run } instead of { run_interactive }
     run("--timeout 5 scan on")
@@ -61,9 +61,9 @@ def start_connection():
     device_name = devices_info[mac_address]
 
     if connect_device(mac_address, choice):
-        rich_print("[bold green]Connected to {device_name}[/bold green]")
+        print_successful_msg("Connected to {device_name}")
     else:
-        rich_print("[bold red]Failed to connect...[/bold red]")
+        print_failed_msg("Failed to connect...")
 
 
 def start_disconnection():
@@ -73,7 +73,7 @@ def start_disconnection():
     console.print(
         Panel(
             f"[bold blue]{device_name}\n{device_mac_address}[/bold blue]",
-            title="Connected device"
+            title="Connected device",
         )
     )
 
@@ -82,16 +82,13 @@ def start_disconnection():
         sys.exit(0)
 
     if disconnect_device(device_mac_address):
-        rich_print(f"[bold green]{device_name} was disconnected[/bold green]")
+        print_successful_msg(f"{device_name} was disconnected")
     else:
-        rich_print(f"[bold red]Failed to disconnect {device_name}[/bold red]")
+        print_failed_msg(f"Failed to disconnect {device_name}")
 
 
 # * The main dict with primary functions
-choice_actions = {
-    "connect": start_connection,
-    "disconnect": start_disconnection
-}
+choice_actions = {"connect": start_connection, "disconnect": start_disconnection}
 
 
 # * THE PRIMARY FUNCTION
