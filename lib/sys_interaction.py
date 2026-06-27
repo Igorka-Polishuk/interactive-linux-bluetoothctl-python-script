@@ -79,16 +79,24 @@ def connect_device(device_mac_address: str, device_name: str) -> bool:
 
     return False
 
+"""
+Get connected device info: name and MAC address
 
-def get_connect_device_info():
+Returns:
+    dict[str: str] | None: The dictionary with device_name and device_mac_address
+        or None if method couldn't get device info
+"""
+def get_connect_device_info() ->  dict[str: str] | None:
     info_result = run("info")
 
-    device_name = re.search(r"^\s*Name:\s*(.+)$", info_result, re.MULTILINE).group(1)
+    device_name = re.search(r"^\s*Name:\s*(.+)$", info_result, re.MULTILINE)
     mac_address = re.search(
         r"^Device\s+([0-9A-F:]{17})", info_result, re.MULTILINE
-    ).group(1)
+    )
+    if not device_name or not mac_address:
+        return
 
-    return {"device_name": device_name, "device_mac_address": mac_address}
+    return {"device_name": device_name.group(1), "device_mac_address": mac_address.group(1)}
 
 
 def disconnect_device(device_mac_address: str) -> bool:

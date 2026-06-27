@@ -67,13 +67,27 @@ def start_connection():
 
 
 def start_disconnection():
-    device_name, device_mac_address = get_connect_device_info().values()
-
     console = Console()
+
+    device_info = get_connect_device_info()
+    if not device_info:
+        console.print(
+            Panel(
+                "",
+                title="[blue]There's no connected device[/blue]",
+                title_align="left",
+            )
+        )
+
+        return
+    
+    device_name, device_mac_address = device_info.values()
+
     console.print(
         Panel(
             f"[bold blue]{device_name}\n{device_mac_address}[/bold blue]",
-            title="Connected device",
+            title="[blue]Connected device[/blue]",
+            title_align="left"
         )
     )
 
