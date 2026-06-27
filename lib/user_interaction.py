@@ -23,10 +23,10 @@ def start_connection():
     if not is_powered():
         is_started = start_bluetoothctl_service()
         if not is_started:
-            print("❌ Failed to enable Bluetooth")
+            rich_print("[bold red]Failed to enable Bluetooth[/bold red]")
             sys.exit(1)
 
-    print("✅ Bluetooth enabled")
+    rich_print("[bold green]Bluetooth enabled[/bold green]")
 
     # ! Use { run } instead of { run_interactive }
     run("--timeout 5 scan on")
@@ -61,12 +61,12 @@ def start_connection():
     device_name = devices_info[mac_address]
 
     if connect_device(mac_address, choice):
-        print(f"✅ Connected to {device_name}")
+        rich_print("[bold green]Connected to {device_name}[/bold green]")
     else:
-        print("❌ Failed to connect...")
+        rich_print("[bold red]Failed to connect...[/bold red]")
 
 
-def start_desconnection():
+def start_disconnection():
     device_name, device_mac_address = get_connect_device_info().values()
 
     console = Console()
@@ -90,7 +90,7 @@ def start_desconnection():
 # * The main dict with primary functions
 choice_actions = {
     "connect": start_connection,
-    "disconnect": start_desconnection
+    "disconnect": start_disconnection
 }
 
 

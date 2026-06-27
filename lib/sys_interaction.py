@@ -8,6 +8,8 @@ from lib.check_state import is_connected
 from lib.interactive_session import run, run_interactive
 from lib.constants import CONNECT_TIMEOUT
 
+from rich import print as rich_print
+
 
 def start_bluetoothctl_service() -> bool:
     unblock_hardware_result = subprocess.run(
@@ -23,12 +25,14 @@ def start_bluetoothctl_service() -> bool:
         )
 
         if result.returncode != 0:
-            print("❌ Wrong password or permission denied")
+            # ? Can I make print_failure at separate module?..
+            rich_print("[bold red]Wrong password or permission denied[/bold red]")
             sys.exit(1)
 
         return True
     else:
-        print("❌ Something went wrong")
+        # ? Can I make print_failure at separate module?..
+        rich_print("[bold red]Wrong password or permission denied[/bold red]")
         sys.exit(1)
 
 
@@ -48,27 +52,27 @@ def get_names_and_mac_addresses_of_devices(input_str: str):
 
 
 def power_on():
-    print("Enabling Bluetooth...")
+    rich_print("[italic blue]Enabling Bluetooth...[/italic blue]")
     run("power on")
     time.sleep(1)
 
 
 def connect_device(device_mac_address: str, device_name: str) -> bool:
     # * ------------------------------Pair and trust------------------------------
-    print(f"‼️ Pairing to {device_name}")
+    rich_print(f"[italic blue]Pairing to {device_name}[/italic blue]")
     run_interactive(f"pair {device_mac_address}", wait=5)
     run_interactive(f"trust {device_mac_address}")
-    print(f"✅ Paired")
+    rich_print(f"[bold green]Paired {device_name}[/bold green]")
     # * ------------------------------Pair and trust------------------------------
 
-    print(f"‼️ Connecting to {device_mac_address}")
+    rich_print(f"[italic blue]Connecting to {device_mac_address}[/italic blue]")
     deadline = time.time() + CONNECT_TIMEOUT
     while deadline > time.time():
         output = run(f"connect {device_mac_address}")
         if "Connection successful" in output or is_connected():
             return True
 
-        print("⭕️Rertying...")
+        rich_print("[underline yellow]Rertying...[/underline yellow]")
         time.sleep(2)
 
     return False
